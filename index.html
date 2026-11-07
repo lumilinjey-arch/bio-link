@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link in Bio</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Подключаем библиотеку иконок FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+
+        
+    <div class="mobile-container">
+        <!-- Кастомное уведомление для соцсетей -->
+        <div id="custom-alert" class="custom-alert hidden">
+            <div class="alert-box">
+                <p>Please complete the CAPTCHA first.</p>
+                <button id="alert-ok-btn">OK</button>
+            </div>
+        </div>
+          <!-- Рекламный экран (Оверлей) -->
+        <div id="ad-overlay" class="ad-overlay hidden">
+            <div class="ad-content">
+                <p class="ad-text">Please watch a short ad to continue</p>
+                <div class="video-wrapper">
+                    <video id="ad-video" src="promo.mp4" autoplay muted playsinline></video>
+                    <div id="ad-timer" class="ad-timer"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Фейковая капча -->
+        <div id="captcha-overlay" class="captcha-overlay hidden">
+            <div class="captcha-modal">
+                <h3>Security Check</h3>
+                <p class="captcha-desc">Please enter the text below to proceed:</p>
+                
+                <div class="captcha-box">
+                    <span id="captcha-text"></span>
+                    <button id="refresh-captcha" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+                </div>
+                
+                <input type="text" id="captcha-input" placeholder="Enter text here">
+                <p id="captcha-error" class="captcha-error hidden">Incorrect CAPTCHA. Please try again.</p>
+                
+                <div class="captcha-actions">
+                    <button id="captcha-cancel" class="btn-cancel">Cancel</button>
+                    <button id="captcha-submit" class="btn-submit">Verify</button>
+                </div>
+            </div>
+        </div>
+        <!-- Соцсети в верхнем левом углу -->
+        <div class="social-icons">
+            <a href="#" class="icon"><i class="fab fa-spotify"></i></a>
+            <a href="#" class="icon"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="icon"><i class="fab fa-x-twitter"></i></a>
+        </div>
+
+        <!-- Блок профиля -->
+        <div class="profile">
+            <div class="avatar-wrapper">
+                <img src="123.jpg" alt="Profile Photo" class="avatar">
+            </div>
+            <h1 class="name">Mia</h1>
+            <p class="subtitle">It's a little hotter here than you expect 💋</p>
+        </div>
+
+        <!-- Кнопки-ссылки -->
+        <div class="links">
+            <a href="#" class="link-btn">Buy Me a Coffee</a>
+            <a href="#" class="link-btn">New video is out!</a>
+            <a href="#" class="link-btn">Spotify playlist</a>
+            <!-- Заменили Latest episode на Snapchat с иконкой -->
+            <a href="#" class="link-btn"><i class="fab fa-snapchat"></i> Snapchat</a>
+            <a href="#" class="link-btn">Follow me</a>
+            <a href="#" class="link-btn">New photo🔥</a>
+            <!-- Добавили новую кнопку OnlyFans с иконкой -->
+            <a href="#" class="link-btn"><span class="custom-icon onlyfans"></span> Onlyfans</a>
+        </div>
+
+        <!-- Поле ввода внизу -->
+        <div class="chat-wrapper">
+            <div class="chat-input">
+                <input type="text" placeholder="Ask me anything..." disabled>
+                <button class="send-btn"><i class="fas fa-arrow-up"></i></button>
+            </div>
+        </div>
+
+    </div>
+    <!-- Скрипт управления рекламой -->
+    <script>
+        // --- ЛОГИКА ФЕЙКОВОЙ КАПЧИ ---
+            const links = document.querySelectorAll('.link-btn');
+            const captchaOverlay = document.getElementById('captcha-overlay');
+            const captchaText = document.getElementById('captcha-text');
+            const captchaInput = document.getElementById('captcha-input');
+            const captchaError = document.getElementById('captcha-error');
+            const btnSubmit = document.getElementById('captcha-submit');
+            const btnCancel = document.getElementById('captcha-cancel');
+            const btnRefresh = document.getElementById('refresh-captcha');
+
+            // Функция генерации случайной строки (5 символов без похожих O/0, I/l)
+            function generateCaptcha() {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+                let result = '';
+                for (let i = 0; i < 5; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                captchaText.textContent = result;
+            }
+
+            // Вешаем событие клика на все кнопки-ссылки
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault(); // Запрещаем реальный переход по ссылке
+                    generateCaptcha(); // Создаем новый код
+                    captchaInput.value = ''; // Очищаем поле ввода
+                    captchaError.classList.add('hidden'); // Прячем ошибку, если она была
+                    captchaOverlay.classList.remove('hidden'); // Показываем окно
+                });
+            });
+
+            // Закрытие по кнопке Cancel
+            btnCancel.addEventListener('click', function() {
+                captchaOverlay.classList.add('hidden');
+            });
+
+            // Обновление капчи
+            btnRefresh.addEventListener('click', generateCaptcha);
+
+            // Обработка отправки (ВСЕГДА выдает ошибку)
+            btnSubmit.addEventListener('click', function() {
+                // Показываем сообщение об ошибке на английском
+                captchaError.classList.remove('hidden');
+                
+                // Очищаем поле и генерируем новую капчу, чтобы заставить пользователя страдать дальше
+                captchaInput.value = '';
+                generateCaptcha();
+                
+                // Ставим фокус обратно в поле ввода для удобства
+                captchaInput.focus();
+            });
+        document.addEventListener("DOMContentLoaded", function() {
+            const adOverlay = document.getElementById('ad-overlay');
+            const adVideo = document.getElementById('ad-video');
+            const adTimer = document.getElementById('ad-timer');
+
+            // Обновляем таймер во время воспроизведения
+            adVideo.addEventListener('timeupdate', function() {
+                // Проверяем, загрузилась ли длина видео, чтобы избежать ошибок (NaN)
+                if (!isNaN(adVideo.duration)) {
+                    // Вычисляем оставшееся время и округляем в большую сторону
+                    const remaining = Math.ceil(adVideo.duration - adVideo.currentTime);
+                    // Выводим в формате "15s"
+                    adTimer.textContent = remaining + 's';
+                }
+            });
+
+            // Закрываем оверлей когда видео полностью завершится
+            adVideo.addEventListener('ended', function() {
+                adOverlay.classList.add('hidden');
+            });
+            // --- ЛОГИКА СОЦСЕТЕЙ И УВЕДОМЛЕНИЯ ---
+            const socialIcons = document.querySelectorAll('.social-icons .icon');
+            const customAlert = document.getElementById('custom-alert');
+            const alertOkBtn = document.getElementById('alert-ok-btn');
+
+            // При клике на соцсети показываем наше красивое окно
+            socialIcons.forEach(icon => {
+                icon.addEventListener('click', function(e) {
+                    e.preventDefault(); // Запрещаем переход
+                    customAlert.classList.remove('hidden'); // Показываем кастомный алерт
+                });
+            });
+
+            // Когда пользователь нажимает "OK" в нашем уведомлении
+            alertOkBtn.addEventListener('click', function() {
+                customAlert.classList.add('hidden'); // Прячем уведомление
+                
+                // И сразу выводим ему капчу
+                generateCaptcha();
+                captchaInput.value = '';
+                captchaError.classList.add('hidden');
+                captchaOverlay.classList.remove('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
